@@ -80,7 +80,6 @@ io.on("connection",(socket)=>{
 
     userSocketIDs.set(user._id.toString(),socket.id);
 
-    // console.log("user connected",socket.id);
 
     socket.on(NEW_MESSAGE,async({chatId,members,message})=>{
         const messgeForRealTime = {
@@ -132,18 +131,22 @@ io.on("connection",(socket)=>{
 
         socket.to(memberSockets).emit(STOP_TYPING,{chatId})
     })
+
     socket.on(CHAT_JOINED,({userId,members})=>{
+        
         onlineUsers.add(userId.toString())
         const membersSocket = getSockets(members);
 
         io.to(membersSocket).emit(ONLINE_USERS,Array.from(onlineUsers))
-    })
+    });
+    
     socket.on(CHAT_LEFT,({userId,members})=>{
         onlineUsers.delete(userId.toString())
         const membersSocket = getSockets(members);
 
         io.to(membersSocket).emit(ONLINE_USERS,Array.from(onlineUsers))
-    })
+    });
+
     socket.on("disconnect",()=>{
         // console.log("user disconnected");
         userSocketIDs.delete(user._id.toString());
